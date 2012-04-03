@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+<head lang="en-GB">
+<meta charset="utf-8"/>
+<link href='http://fonts.googleapis.com/css?family=Sansita+One|Kameron' rel='stylesheet'>
+<link rel="stylesheet" href="styles/normalise.css">
+<link rel="stylesheet" href="styles/style.css">
+<link rel="stylesheet" href="styles/animation.css">
+<script>
+;(function () {
+
+    //"use strict";
+    var doc, win, music, stop_music, add_warning, full_page, play_music, altFullscreenchange, delete_warrning, request_smallscreen, change_animation, mozilla_bug_hug;
+    // create local variable of global variables for good optimisation
+    doc = document;
+    win = window;
+
+    // Audio section
+    music = function () {
+
+        var audio, myAudio, parentEle, bodyPar, credits;
+
+        myAudio = doc.createElement('audio');
+
+        // check for browser support for Audio APIS
+        if (myAudio.canPlayType) {
+
+            // create element where the audio player will sit in
+            parentEle = doc.createElement("div");
+            parentEle.id = "audio-cont";
+            parentEle.setAttribute("class", "opacity-zero");
+
+            // create element that shows user what the music is that is playing
+            credits = doc.createElement("span");
+            credits.innerHTML = 'Music by <a href="http://www.facebook.com/Tonstartssbandht">Tonstartssbandht</a>';
+
+            // attachto audio player parent element
+            parentEle.appendChild(credits);
+
+            // create the audio player
+            audio = doc.createElement('audio');
+            audio.style.opacity = "0.5";
+
+            // determine which audio file sytem is supported by the browser
+            if (myAudio.canPlayType('audio/mpeg') === "maybe") {
+                audio.src = 'music/Tonstartssbandht_Black_Country.mp3';
+            } else if (myAudio.canPlayType('audio/wav') === "maybe") {
+                audio.src = 'music/Tonstartssbandht_Black_Country.wav';
+            } else {
+                audio.src = 'music/Tonstartssbandht_Black_Country.ogg';
+            }
+
+            // add controls and other variables
+            audio.setAttribute("controls", "controls");
+            audio.autoplay = false;
+            audio.preload = "auto";
+            audio.volume = "0.6";
+            audio.autobuffer = true;
+
+            // append the audio player to the parent div created above
+            parentEle.appendChild(audio);
+
+            // attach everything to the body
+            bodyPar = doc.getElementsByTagName('body')[0];
+            bodyPar.appendChild(parentEle);
+
+        }
+
+    }; // end music
+    play_music = function () {
+
+        var audio, parentCont;
+
+        if (doc.querySelector("#audio-cont")) {
+
+            parentCont = doc.querySelector("#audio-cont");
+            parentCont.removeAttribute("class", "opacity-zero");
+            parentCont.setAttribute("class", "opacity-full");
+
+            audio = doc.getElementsByTagName('audio')[0];
+            audio.play();
+
+        }
+
+    }; // end play_music
+    stop_music = function () {
+
+        var audio, parentCont;
+
+        if (doc.querySelector("#audio-cont")) {
+
+            parentCont = doc.querySelector("#audio-cont");
+            parentCont.removeAttribute("class", "opacity-full");
+            parentCont.setAttribute("class", "opacity-zero");
+
+            audio = doc.getElementsByTagName('audio')[0];
+            audio.pause();
+
+        }
+
+    }; // end stop_music
+    // ESC warning at bottom of page
+    delete_warrning = function () {
+
+        var classDelete, parent;
+
+        if (doc.querySelector(".deleteESC")) {
+            classDelete = doc.querySelector(".deleteESC");
+            parent = classDelete.parentNode;
+            parent.removeChild(classDelete);
+        }
+
+
+    }; // end delete_warrning
+    add_warning = function () {
+
+        delete_warrning();
+
+        var parentElement, newElement, childElement, paraElement, classDelete, parent;
+
+        // create message at the bottom of wrapper for good UX
+        parentElement = doc.querySelector("#wrapper");
+
+        newElement = doc.createElement("div");
+        newElement.innerHTML = '<p>Press ESC or click here to leave full screen mode</p>';
+
+        newElement.setAttribute("class", "deleteESC");
+        parentElement.appendChild(newElement);
+
+    }; // end add_warning
+
+    // Add different animations on overlay event
+    change_animation = function (htmlElement) {
+
+        var items, random, regEx, result, key, mainBlock, cloneBlock, parentBlock;
+
+        // below finds the unique key which is in the parent div id
+        function removeArrayElement(element, index, array) {
+            return (!element.search("^([0-9]+)$"));
+        }
+
+        regEx = /.([0-9]+)$/;
+        result = regEx.exec(htmlElement.parentNode);
+        key = result.filter(removeArrayElement).toString();
+
+        // this unique key is then used to find the large image in the overlay
+        // this is an alternative to some bonkers DOM transversal method
+        mainBlock = doc.querySelector("#block-" + key + " img");
+
+        // remove previous animation class
+        mainBlock.removeAttribute("class", "");
+
+        // In order for CSS animation to run more than once on the same element
+        // It is necessary to rebuild the node
+        // See for further details: http://css-tricks.com/restart-css-animation/
+        cloneBlock = mainBlock.cloneNode(true);
+
+        // select a class at random
+        items = ['image3D', 'flipper', 'bulge', 'bouncing', 'side-spin', 'top-spin', 'shadow-play', 'rush'];
+        random = items[Math.floor(Math.random() * items.length)];
+
+        // rebuild the html adding the new class
+        cloneBlock.setAttribute("class", random);
+
+        parentBlock = mainBlock.parentNode;
+        parentBlock.removeChild(mainBlock);
+        parentBlock.appendChild(cloneBlock);
+
+    }; // end change_animation
+    // event-based functions
+    // There is a conclict between esc fullscreen mode and closing the overlays
+    // This only exists in mozila but not in Safari or Chrome
+    mozilla_bug_hug = function () {
+
+        if (navigator.userAgent.indexOf("Firefox") !== -1) {
+
+            var link, x, docElm, l, current;
+
+            link = doc.querySelectorAll(".second-image dl dd:last-child a");
+
+            for (x = 0, l = link.length; x < l; x += 1) {
+
+                // call full screen when clicking on the thumbnail
+                link[x].addEventListener("click", function (evt) {
+
+                    if (!doc.mozFullScreen) {
+
+                        current = win.location.href;
+                        current = current.replace(win.location.hash, "");
+                        win.location.replace(current);
+
+                    }
+
+                }, false);
+
+            }
+
+        }
+
+    }; // end mozilla_bug_hug
+    altFullscreenchange = function () {
+
+        var elem;
+        elem = doc.documentElement;
+
+        doc.addEventListener("mozfullscreenchange", function () {
+            if (!this.mozFullScreen) {
+                // on leave full screen remove the paragraph and the music player and reverse HTML overflow to visible
+                stop_music();
+                delete_warrning();
+                elem.style.overflow = "visible";
+            } else {
+                elem.style.overflow = "hidden";
+            }
+        }, false);
+
+        doc.addEventListener("webkitfullscreenchange", function () {
+            if (!this.webkitIsFullScreen) {
+                // on leave full screen remove the paragraph and the music player and reverse HTML overflow to visible
+                stop_music();
+                delete_warrning();
+                elem.style.overflow = "visible";
+            } else {
+                elem.style.overflow = "hidden";
+            }
+        }, false);
+
+    }; // end altFullscreenchange
+    request_smallscreen = function () {
+
+        var deleteNode;
+
+        if (doc.querySelector(".deleteESC")) {
+
+            deleteNode = doc.querySelector(".deleteESC");
+
+            deleteNode.addEventListener("click", function (evt) {
+
+                if (doc.cancelFullScreen) {
+                    doc.cancelFullScreen();
+                } else if (doc.mozCancelFullScreen) {
+                    doc.mozCancelFullScreen();
+                } else if (doc.webkitCancelFullScreen) {
+                    doc.webkitCancelFullScreen();
+                }
+
+            }, false);
+
+        }
+
+    }; // end request_smallscreen
+    full_page = function () {
+
+        var img, x, docElm, l;
+
+        img = doc.querySelectorAll(".first-image img");
+
+        for (x = 0, l = img.length; x < l; x += 1) {
+
+            // call full screen when clicking on the thumbnail
+            img[x].addEventListener("click", function (evt) {
+
+                docElm = doc.documentElement;
+
+                if (docElm.requestFullScreen) {
+                    docElm.requestFullScreen();
+                    play_music();
+                    add_warning();
+                    change_animation(this);
+                    request_smallscreen();
+                } else if (docElm.mozRequestFullScreen) {
+                    docElm.mozRequestFullScreen();
+                    play_music();
+                    add_warning();
+                    change_animation(this);
+                    request_smallscreen();
+                } else if (docElm.webkitRequestFullScreen) {
+                    docElm.webkitRequestFullScreen();
+                    play_music();
+                    add_warning();
+                    change_animation(this);
+                    request_smallscreen();
+                }
+
+            }, false);
+
+        } // end for loop
+        altFullscreenchange();
+        mozilla_bug_hug();
+
+    }; // end full_page
+    win.onload = function () {
+        full_page();
+        // remove below if music not required
+        music();
+    };
+
+})();
+//https://developer.mozilla.org/en/CSS/CSS_animations/Detecting_CSS_animation_support
+//http://www.nomensa.com/blog/2011/detecting-browser-compatibility-for-html5-video-and-audio/
+</script>
+
+<title>LightBox Ultra</title>
+</head>
+<body>
+<div id="wrapper">
+  <dl id="photo-gallery" class="clearfix">
+    <dt><span>Lightbox</span> <span>Ultra</span></dt>
+    <dd>
+      <!-- begin photo one -->
+      <dl>
+        <dd class="first-image">
+          <dl>
+            <dt>Inside the Sarkophargus</dt>
+            <dd ><a href="#block-1"><img src="images/small/pic-one-small.jpg" width="150" height="225" alt="pic one small" ></a></dd>
+          </dl>
+        </dd>
+        <dd class="second-image">
+          <dl id="block-1">
+            <dt>Inside the Sarkophargus</dt>
+            <dd><img src="images/large/pic-one-large.jpg" width="400" height="600" alt="pic one large" class="animation"><span class="spinning-wheel"></span></dd>
+            <dd>Quisque nisi risus, porta sit amet venenatis vitae, posuere eget mauris</dd>
+            <dd><a href="#photo-gallery">X Close</a></dd>
+          </dl>
+        </dd>
+      </dl>
+      <!-- end photo one -->
+      <!-- begin photo two -->
+      <dl>
+        <dd class="first-image">
+          <dl>
+            <dt>Delta Waves</dt>
+            <dd><a href="#block-2"> <img src="images/small/pic-two-small.jpg" width="150" height="147" alt="pic two small" class="animation"> </a> </dd>
+          </dl>
+        </dd>
+        <dd class="second-image">
+          <dl id="block-2">
+            <dt>Delta Waves</dt>
+            <dd> <img src="images/large/pic-two-large.jpg" width="400" height="392" alt="pic two large" class="animation"><span class="spinning-wheel"></span> </dd>
+            <dd>Vestibulum consequat, mi id consequat pharetra, diam ipsum condimentum dui, et eleifend felis augue vitae ipsum</dd>
+            <dd><a href="#photo-gallery">X Close</a></dd>
+          </dl>
+        </dd>
+      </dl>
+      <!-- begin photo two -->
+      <!-- begin photo three -->
+      <dl>
+        <dd class="first-image">
+          <dl>
+            <dt>Metal Feathers Can Fly</dt>
+            <dd><a href="#block-3"> <img src="images/small/pic-three-small.jpg" width="150" height="225" alt="pic three small"> </a></dd>
+          </dl>
+        </dd>
+        <dd class="second-image">
+          <dl id="block-3">
+            <dt>Metal Feathers Can Fly</dt>
+            <dd> <img src="images/large/pic-three-large.jpg" width="400" height="600" alt="pic three large" class="animation"><span class="spinning-wheel"></span ></dd>
+            <dd>Duis vitae diam a lectus malesuada lacinia. Nullam ultrices rutrum leo, at pretium nunc ultricies id</dd>
+            <dd><a href="#photo-gallery">X Close</a></dd>
+          </dl>
+        </dd>
+      </dl>
+      <!-- begin photo three -->
+      <!-- begin photo four -->
+      <dl>
+        <dd class="first-image">
+          <dl>
+            <dt>Siklekråke</dt>
+            <dd><a href="#block-4"><img src="images/small/pic-small-four.jpg" width="150" height="188" alt="small photo four"></a></dd>
+          </dl>
+        </dd>
+        <dd class="second-image">
+          <dl id="block-4">
+            <dt>Siklekråke</dt>
+            <dd><img src="images/large/pic-large-four.jpg" width="400" height="500" alt="pic four large" class="animation"> <span class="spinning-wheel"></span></dd>
+            <dd>Quisque nisi risus, porta sit amet venenatis vitae, posuere eget mauris</dd>
+            <dd><a href="#photo-gallery">X Close</a></dd>
+          </dl>
+        </dd>
+      </dl>
+      <!-- end photo four -->
+      <!-- begin photo five -->
+      <dl>
+        <dd class="first-image">
+          <dl>
+            <dt>Disengaged</dt>
+            <dd><a href="#block-5"><img src="images/small/pic-five-small.jpg" width="150" height="200" alt="small pic five"> </a></dd>
+          </dl>
+        </dd>
+        <dd class="second-image">
+          <dl id="block-5">
+            <dt>Disengaged</dt>
+            <dd> <img src="images/large/pic-five-large.jpg" width="400" height="533" alt="pic five large" class="animation"> <span class="spinning-wheel"></span></dd>
+            <dd>Duis non risus sed est facilisis facilisis ut eu est.</dd>
+            <dd><a href="#photo-gallery">X Close</a></dd>
+          </dl>
+        </dd>
+      </dl>
+      <!-- end photo five -->
+      <!-- begin photo six -->
+      <dl>
+        <dd class="first-image">
+          <dl>
+            <dt>All this Beneath a Burnt-Orange Sky</dt>
+            <dd><a href="#block-6"> <img src="images/small/pic-six-small.jpg" width="150" height="226" alt="small pic six"> </a></dd>
+          </dl>
+        </dd>
+        <dd class="second-image">
+          <dl id="block-6">
+            <dt>All this Beneath a Burnt-Orange Sky</dt>
+            <dd> <img src="images/large/pic-six-large.jpg" width="400" height="602" alt="large pic six" class="animation"> <span class="spinning-wheel"></span></dd>
+            <dd>Suspendisse turpis est, laoreet vel imperdiet sed, pharetra non lectus. Aenean odio ipsum, venenatis eget mattis sed, auctor vel sem.</dd>
+            <dd><a href="#photo-gallery">X Close</a></dd>
+          </dl>
+        </dd>
+      </dl>
+      <!-- end photo six -->
+      <!-- begin photo seven -->
+      <dl>
+        <dd class="first-image">
+          <dl>
+            <dt>Clouds Over Earthquake</dt>
+            <dd><a href="#block-7"> <img src="images/small/pic-seven-small.jpg" width="150" height="200" alt="small pic seven"> </a></dd>
+          </dl>
+        </dd>
+        <dd class="second-image">
+          <dl id="block-7">
+            <dt>Clouds Over Earthquake</dt>
+            <dd> <img src="images/large/pic-seven-large.jpg" width="400" height="533" alt="large pic seven" class="animation"> <span class="spinning-wheel"></span></dd>
+            <dd>Vestibulum quis nibh ante, in lacinia tellus. Pellentesque nec dolor sapien. Ut id neque gravida risus elementum scelerisque.</dd>
+            <dd><a href="#photo-gallery">X Close</a></dd>
+          </dl>
+        </dd>
+      </dl>
+      <!-- end photo sevem -->
+      <!-- begin photo eight -->
+      <dl>
+        <dd class="first-image">
+          <dl>
+            <dt>Stolen Silence</dt>
+            <dd><a href="#block-8"> <img src="images/small/pic-eight-small.jpg" width="150" height="224" alt="small pic eight"> </a></dd>
+          </dl>
+        </dd>
+        <dd class="second-image">
+          <dl id="block-8">
+            <dt>Stolen Silence</dt>
+            <dd> <img src="images/large/pic-eight-large.jpg" width="400" height="598" alt="large pic eight" class="animation"> <span class="spinning-wheel"></span></dd>
+            <dd>Cras et mi mattis tellus malesuada congue. Fusce odio felis, rutrum vel porta a, laoreet at diam.</dd>
+            <dd><a href="#photo-gallery">X Close</a></dd>
+          </dl>
+        </dd>
+      </dl>
+      <!-- end photo eight -->
+      <!-- begin photo nine -->
+      <dl>
+        <dd class="first-image">
+          <dl>
+            <dt>The Sun Always Shines On TV</dt>
+            <dd><a href="#block-9"> <img src="images/small/pic-small-large.jpg" width="150" height="145" alt="small pic nine"> </a></dd>
+          </dl>
+        </dd>
+        <dd class="second-image">
+          <dl id="block-9">
+            <dt>The Sun Always Shines On TV</dt>
+            <dd> <img src="images/large/pic-large-nine.jpg" width="400" height="387" alt="large pic nine" class="animation"> <span class="spinning-wheel"></span></dd>
+            <dd>Vivamus ultrices, diam et condimentum rhoncus, lectus justo pellentesque nulla, vitae vestibulum velit dui a est. </dd>
+            <dd><a href="#photo-gallery">X Close</a></dd>
+          </dl>
+        </dd>
+      </dl>
+      <!-- end photo nine-->
+    </dd>
+  </dl>
+  <span>Demo by AndyW &gt; <a href="https://twitter.com/#!/andywalpole">twitter</a></span>
+</div>
+</body>
+</html>
