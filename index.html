@@ -10,95 +10,11 @@
 ;(function () {
 
     //"use strict";
-    var doc, win, music, stop_music, add_warning, full_page, play_music, altFullscreenchange, delete_warrning, request_smallscreen, change_animation, mozilla_bug_hug;
+    var doc, win, add_warning, full_page, altFullscreenchange, delete_warrning, request_smallscreen, change_animation, mozilla_bug_hug;
     // create local variable of global variables for good optimisation
     doc = document;
     win = window;
 
-    // Audio section
-    music = function () {
-
-        var audio, myAudio, parentEle, bodyPar, credits;
-
-        myAudio = doc.createElement('audio');
-
-        // check for browser support for Audio APIS
-        if (myAudio.canPlayType) {
-
-            // create element where the audio player will sit in
-            parentEle = doc.createElement("div");
-            parentEle.id = "audio-cont";
-            parentEle.setAttribute("class", "opacity-zero");
-
-            // create element that shows user what the music is that is playing
-            credits = doc.createElement("span");
-            credits.innerHTML = 'Music by <a href="http://www.facebook.com/Tonstartssbandht">Tonstartssbandht</a>';
-
-            // attachto audio player parent element
-            parentEle.appendChild(credits);
-
-            // create the audio player
-            audio = doc.createElement('audio');
-            audio.style.opacity = "0.5";
-
-            // determine which audio file sytem is supported by the browser
-            if (myAudio.canPlayType('audio/mpeg') === "maybe") {
-                audio.src = 'music/Tonstartssbandht_Black_Country.mp3';
-            } else if (myAudio.canPlayType('audio/wav') === "maybe") {
-                audio.src = 'music/Tonstartssbandht_Black_Country.wav';
-            } else {
-                audio.src = 'music/Tonstartssbandht_Black_Country.ogg';
-            }
-
-            // add controls and other variables
-            audio.setAttribute("controls", "controls");
-            audio.autoplay = false;
-            audio.preload = "auto";
-            audio.volume = "0.6";
-            audio.autobuffer = true;
-
-            // append the audio player to the parent div created above
-            parentEle.appendChild(audio);
-
-            // attach everything to the body
-            bodyPar = doc.getElementsByTagName('body')[0];
-            bodyPar.appendChild(parentEle);
-
-        }
-
-    }; // end music
-    play_music = function () {
-
-        var audio, parentCont;
-
-        if (doc.querySelector("#audio-cont")) {
-
-            parentCont = doc.querySelector("#audio-cont");
-            parentCont.removeAttribute("class", "opacity-zero");
-            parentCont.setAttribute("class", "opacity-full");
-
-            audio = doc.getElementsByTagName('audio')[0];
-            audio.play();
-
-        }
-
-    }; // end play_music
-    stop_music = function () {
-
-        var audio, parentCont;
-
-        if (doc.querySelector("#audio-cont")) {
-
-            parentCont = doc.querySelector("#audio-cont");
-            parentCont.removeAttribute("class", "opacity-full");
-            parentCont.setAttribute("class", "opacity-zero");
-
-            audio = doc.getElementsByTagName('audio')[0];
-            audio.pause();
-
-        }
-
-    }; // end stop_music
     // ESC warning at bottom of page
     delete_warrning = function () {
 
@@ -206,7 +122,6 @@
         doc.addEventListener("mozfullscreenchange", function () {
             if (!this.mozFullScreen) {
                 // on leave full screen remove the paragraph and the music player and reverse HTML overflow to visible
-                stop_music();
                 delete_warrning();
                 elem.style.overflow = "visible";
             } else {
@@ -217,7 +132,6 @@
         doc.addEventListener("webkitfullscreenchange", function () {
             if (!this.webkitIsFullScreen) {
                 // on leave full screen remove the paragraph and the music player and reverse HTML overflow to visible
-                stop_music();
                 delete_warrning();
                 elem.style.overflow = "visible";
             } else {
@@ -264,19 +178,16 @@
 
                 if (docElm.requestFullScreen) {
                     docElm.requestFullScreen();
-                    play_music();
                     add_warning();
                     change_animation(this);
                     request_smallscreen();
                 } else if (docElm.mozRequestFullScreen) {
                     docElm.mozRequestFullScreen();
-                    play_music();
                     add_warning();
                     change_animation(this);
                     request_smallscreen();
                 } else if (docElm.webkitRequestFullScreen) {
                     docElm.webkitRequestFullScreen();
-                    play_music();
                     add_warning();
                     change_animation(this);
                     request_smallscreen();
@@ -292,7 +203,6 @@
     win.onload = function () {
         full_page();
         // remove below if music not required
-        music();
     };
 
 })();
@@ -401,7 +311,7 @@
       <dl>
         <dd class="first-image">
           <dl>
-            <dt>All this Beneath a Burnt-Orange Sky</dt>
+            <dt>Beneath a Burnt-Orange Sky</dt>
             <dd><a href="#block-6"> <img src="images/small/pic-six-small.jpg" width="150" height="226" alt="small pic six"> </a></dd>
           </dl>
         </dd>

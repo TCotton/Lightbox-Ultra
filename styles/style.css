@@ -25,7 +25,7 @@ textarea {
 
 body {
     font: 62.5% sans-serif;
-    background: #E7E9D1;
+    background: #E7E9D1 url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAEElEQVQImWO4fGXVfwY6AABT0wNRNbIoCAAAAABJRU5ErkJggg==");
     line-height: 2em;
 }
 
@@ -37,7 +37,7 @@ body {
 
 #photo-gallery {
     width: 600px;
-    background: #D3D4AA;
+    background: #D3D4AA url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWN4/vLifwaiAE6VAELDB0GsQ10NAAAAAElFTkSuQmCC");
     margin: 0 auto;
     padding: 15px;
     border: 2px solid #fff;
@@ -68,11 +68,11 @@ dl>dd>dl {
 .first-image {
     float: left;
 	/* Fallback for non-calc() supporting browsers */
-    width: 178px;
-    width: -moz-calc(33% - 20px);
-    width: -webkit-calc(33% - 20px);
-    width: calc(33% - 20px);
-    margin: 0 10px;
+    width: 158px;
+    width: -moz-calc(30% - 20px);
+    width: -webkit-calc(30% - 20px);
+    width: calc(30% - 20px);
+    margin: 0 20px;
     text-align: center;
 }
 /* small img */
